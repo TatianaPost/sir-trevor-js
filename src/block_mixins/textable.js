@@ -1,12 +1,12 @@
 "use strict";
 
-var selectionRange = require('selection-range');
+var selectionRange = require("selection-range");
 
 module.exports = {
-  mixinName: 'Textable',
+  mixinName: "Textable",
 
   initializeTextable: function() {
-    this.el.classList.add('st-block--textable');
+    this.el.classList.add("st-block--textable");
   },
 
   focusAtEnd: function() {
@@ -28,18 +28,22 @@ module.exports = {
   },
 
   getScribeInnerContent: function(block) {
-    var content = '';
-    if (this._scribe.getTextContent() !== '') {
-      var fakeContent = document.createElement('div');
+    var content = "";
+    if (this._scribe.getTextContent() !== "") {
+      var fakeContent = document.createElement("div");
       fakeContent.innerHTML = this.getTextBlockHTML();
 
       // We concatenate the content of each paragraph and take into account the new lines
-      content = fakeContent.children &&
-        Array.prototype.slice.call(fakeContent.children).reduce(function (res, child) {
-          return res + child.innerHTML;
-        }, '') || fakeContent.innerHTML;
+      content =
+        (fakeContent.children &&
+          Array.prototype.slice
+            .call(fakeContent.children)
+            .reduce(function(res, child) {
+              return res + child.innerHTML;
+            }, "")) ||
+        fakeContent.innerHTML;
 
-      return content.replace(/^[\s\uFEFF\xA0]+|$/g, '');
+      return content.replace(/^[\s\uFEFF\xA0]+|$/g, "");
     }
     return content;
   },
@@ -53,22 +57,32 @@ module.exports = {
   appendContent: function(content, options) {
     options = options || {};
 
+    this.focusAtEnd();
+
     var caretPosition = this.getCaretPositionAtEnd();
 
+    // Strip extra spaces on the end of content.
     var currentContent = this.getScribeInnerContent();
-    if (currentContent !== '') {
+    this.setTextBlockHTML(currentContent);
+    currentContent = this.getScribeInnerContent();
+
+    if (currentContent !== "") {
       content = currentContent + content;
     }
 
-    if (content === '') {
-      content = '<br>';
+    if (content === "") {
+      content = "<br>";
     }
 
     this.setTextBlockHTML(content);
 
     this.focus();
 
-    if (options.keepCaretPosition && caretPosition.start !== 0 && caretPosition.end !== 0) {
+    if (
+      options.keepCaretPosition &&
+      caretPosition.start !== 0 &&
+      caretPosition.end !== 0
+    ) {
       selectionRange(this._scribe.el, {
         start: caretPosition.start,
         end: caretPosition.end
